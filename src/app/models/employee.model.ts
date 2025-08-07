@@ -4,4 +4,6 @@ export interface Employee {
   role: string;
   department: string;
   email: string;
+  mobile: string;
+  isActive: boolean;
 }

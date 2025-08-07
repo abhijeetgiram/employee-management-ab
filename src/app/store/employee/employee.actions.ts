@@ -41,3 +41,19 @@ export const deleteEmployeeSuccess = createAction(
   '[Employee] Delete Employee Success',
   props<{ id: string }>()
 );
+
+// Load Employee by ID
+export const loadEmployeeById = createAction(
+  '[Employee Detail] Load Employee By Id',
+  props<{ id: string }>()
+);
+
+export const loadEmployeeByIdSuccess = createAction(
+  '[Employee Detail] Load Employee By Id Success',
+  props<{ employee: Employee }>()
+);
+
+export const loadEmployeeByIdFailure = createAction(
+  '[Employee Detail] Load Employee By Id Failure',
+  props<{ error: any }>()
+);

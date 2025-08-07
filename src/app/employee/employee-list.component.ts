@@ -1,21 +1,45 @@
-import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EMPLOYEES } from '../shared/mock-data';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
+import { Employee } from '../models/employee.model';
+import * as EmployeeActions from '../store/employee/employee.actions';
+import * as EmployeeSelectors from '../store/employee/employee.selectors';
+import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  selector: 'app-employee-list',
+  imports: [CommonModule, FormsModule, RouterModule, EmployeeSearchPipe],
   template: `
     <div class="container mt-4">
       <h2>Employee List</h2>
+
+      <!-- Search input -->
       <input
         class="form-control mb-3"
         placeholder="Search by name or department"
         [(ngModel)]="searchText"
       />
-      <table class="table table-bordered">
+
+      <!-- Loading state -->
+      <div *ngIf="loading$ | async" class="alert alert-info">
+        Loading employees...
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="error$ | async as error" class="alert alert-danger">
+        Error: {{ error }}
+      </div>
+
+      <!-- Employee table -->
+      <table
+        class="table table-bordered"
+        *ngIf="(employees$ | async)?.length > 0; else noData"
+      >
         <thead>
           <tr>
             <th>Name</th>
@@ -26,7 +50,9 @@ import { EMPLOYEES } from '../shared/mock-data';
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let emp of filteredEmployees()">
+          <tr
+            *ngFor="let emp of employees$ | async | employeeSearch : searchText"
+          >
             <td>
               <a [routerLink]="['/employee', emp.id]">{{ emp.name }}</a>
             </td>
@@ -40,16 +66,26 @@ import { EMPLOYEES } from '../shared/mock-data';
               >
                 Edit
               </button>
-              <button class="btn btn-sm btn-danger" (click)="delete(emp.id)">
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteEmployee(emp.id)"
+              >
                 Delete
               </button>
             </td>
           </tr>
         </tbody>
       </table>
+
+      <!-- No employees -->
+      <ng-template #noData>
+        <p class="text-muted">No employees found.</p>
+      </ng-template>
+
+      <!-- Add Employee -->
       <button
         *ngIf="isAdmin"
-        class="btn btn-primary"
+        class="btn btn-primary mt-3"
         [routerLink]="['/employee-add']"
       >
         Add Employee
@@ -57,22 +93,29 @@ import { EMPLOYEES } from '../shared/mock-data';
     </div>
   `,
 })
-export class EmployeeListComponent {
-  employees = EMPLOYEES;
+export class EmployeeListComponent implements OnInit {
+  private store = inject(Store);
+
+  employees$: Observable<Employee[]> = this.store.select(
+    EmployeeSelectors.selectAllEmployees
+  );
+  loading$: Observable<boolean> = this.store.select(
+    EmployeeSelectors.selectLoading
+  );
+  error$: Observable<string | null> = this.store.select(
+    EmployeeSelectors.selectError
+  );
+
   searchText = '';
   isAdmin = localStorage.getItem('role') === 'admin';
 
-  filteredEmployees() {
-    return this.employees.filter(
-      (emp) =>
-        emp.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        emp.department.toLowerCase().includes(this.searchText.toLowerCase())
-    );
+  ngOnInit() {
+    this.store.dispatch(EmployeeActions.loadEmployees());
   }
 
-  delete(id: number) {
+  deleteEmployee(id: string) {
     if (confirm('Are you sure to delete?')) {
-      this.employees = this.employees.filter((emp) => emp.id !== id);
+      this.store.dispatch(EmployeeActions.deleteEmployee({ id }));
     }
   }
 }

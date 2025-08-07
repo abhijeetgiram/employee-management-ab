@@ -1,8 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EMPLOYEES } from '../shared/mock-data';
+import { Store } from '@ngrx/store';
+import { Employee } from '../models/employee.model';
+import {
+  addEmployee,
+  updateEmployee,
+  loadEmployees,
+} from '../store/employee/employee.actions';
+import { selectAllEmployees } from '../store/employee/employee.selectors';
 
 @Component({
   standalone: true,
@@ -41,25 +48,23 @@ import { EMPLOYEES } from '../shared/mock-data';
           />
         </div>
         <div class="mb-3">
-          <label>Mobile</label>
+          <label>Email</label>
           <input
-            [(ngModel)]="employee.mobile"
-            name="mobile"
+            [(ngModel)]="employee.email"
+            name="email"
             required
             class="form-control"
+            type="email"
           />
         </div>
         <div class="mb-3">
-          <label>Status</label>
-          <select
-            [(ngModel)]="employee.isActive"
-            name="isActive"
+          <label>Role</label>
+          <input
+            [(ngModel)]="employee.role"
+            name="role"
             required
             class="form-control"
-          >
-            <option [ngValue]="true">Active</option>
-            <option [ngValue]="false">Inactive</option>
-          </select>
+          />
         </div>
         <button class="btn btn-success" [disabled]="!empForm.valid">
           {{ isEdit ? 'Update' : 'Add' }}
@@ -69,35 +74,45 @@ import { EMPLOYEES } from '../shared/mock-data';
   `,
 })
 export class EmployeeFormComponent implements OnInit {
-  employee: any = {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private store = inject(Store);
+
+  employee: Employee = {
     id: '',
     name: '',
     department: '',
+    email: '',
+    role: '',
     mobile: '',
     isActive: true,
   };
-  isEdit = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  isEdit = false;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      const emp = EMPLOYEES.find((e) => e.id === +id);
-      if (emp) {
-        this.employee = { ...emp };
-        this.isEdit = true;
-      }
+      this.isEdit = true;
+
+      // Make sure employees are loaded
+      this.store.dispatch(loadEmployees());
+
+      this.store.select(selectAllEmployees).subscribe((employees) => {
+        const emp = employees.find((e) => e.id === id);
+        if (emp) {
+          this.employee = { ...emp };
+        }
+      });
     }
   }
 
   submitForm() {
     if (this.isEdit) {
-      const index = EMPLOYEES.findIndex((e) => e.id === +this.employee.id);
-      EMPLOYEES[index] = this.employee;
+      this.store.dispatch(updateEmployee({ employee: this.employee }));
       alert('Employee updated!');
     } else {
-      EMPLOYEES.push(this.employee);
+      this.store.dispatch(addEmployee({ employee: this.employee }));
       alert('Employee added!');
     }
     this.router.navigate(['/employees']);

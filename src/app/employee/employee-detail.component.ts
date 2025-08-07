@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EMPLOYEES } from '../shared/mock-data';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { Employee } from '../models/employee.model';
+import * as EmployeeActions from '../store/employee/employee.actions';
+import * as fromEmployee from '../store/employee/employee.selectors';
 
 @Component({
   standalone: true,
   selector: 'app-employee-detail',
   imports: [CommonModule],
   template: `
-    <div class="container mt-5" *ngIf="employee">
+    <div class="container mt-5" *ngIf="employee$ | async as employee">
       <h2>Employee Details</h2>
       <ul class="list-group">
         <li class="list-group-item"><strong>ID:</strong> {{ employee.id }}</li>
@@ -30,12 +34,16 @@ import { EMPLOYEES } from '../shared/mock-data';
   `,
 })
 export class EmployeeDetailComponent implements OnInit {
-  employee: any;
+  private route = inject(ActivatedRoute);
+  employee$: Observable<Employee | null>;
+  private store = inject(Store);
 
-  constructor(private route: ActivatedRoute) {}
+  constructor() {
+    this.employee$ = this.store.select(fromEmployee.selectSelectedEmployee);
+  }
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.employee = EMPLOYEES.find((e) => e.id === +id!);
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.store.dispatch(EmployeeActions.loadEmployeeById({ id }));
   }
 }

@@ -18,3 +18,8 @@ export const selectError = createSelector(
   selectEmployeeState,
   (state) => state.error
 );
+
+export const selectSelectedEmployee = createSelector(
+  selectEmployeeState,
+  (state) => state.selectedEmployee
+);
