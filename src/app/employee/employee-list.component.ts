@@ -10,6 +10,7 @@ import * as EmployeeActions from '../store/employee/employee.actions';
 import * as EmployeeSelectors from '../store/employee/employee.selectors';
 import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
 import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
+import { StatusHighlightDirective } from '../directives/status-highlight.directive';
 
 @Component({
   standalone: true,
@@ -20,6 +21,7 @@ import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
     RouterModule,
     EmployeeSearchPipe,
     MobileFormatPipe,
+    StatusHighlightDirective,
   ],
   template: `
     <div class="container mt-4">
@@ -67,7 +69,9 @@ import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
             </td>
             <td>{{ emp.department }}</td>
             <td>{{ emp.mobile | mobileFormat }}</td>
-            <td>{{ emp.isActive ? 'Active' : 'Inactive' }}</td>
+            <td appStatusHighlight [isActive]="emp.isActive">
+              {{ emp.isActive ? 'Active' : 'Inactive' }}
+            </td>
             <td *ngIf="isAdmin">
               <button
                 class="btn btn-sm btn-warning"
