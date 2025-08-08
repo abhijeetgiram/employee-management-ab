@@ -1,4 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  ComponentRef,
+  inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +17,8 @@ import * as EmployeeSelectors from '../store/employee/employee.selectors';
 import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
 import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
 import { StatusHighlightDirective } from '../directives/status-highlight.directive';
+import { DynamicComponentService } from '../services/dynamic-component.service';
+import { DeleteModalComponent } from '../shared/delete-modal.component';
 
 @Component({
   standalone: true,
@@ -106,8 +114,9 @@ import { StatusHighlightDirective } from '../directives/status-highlight.directi
     </div>
   `,
 })
-export class EmployeeListComponent implements OnInit {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   private store = inject(Store);
+  private dynamicComponentService = inject(DynamicComponentService);
 
   employees$: Observable<Employee[]> = this.store.select(
     EmployeeSelectors.selectAllEmployees
@@ -126,9 +135,32 @@ export class EmployeeListComponent implements OnInit {
     this.store.dispatch(EmployeeActions.loadEmployees());
   }
 
+  private activeModal?: ComponentRef<DeleteModalComponent>;
+
   deleteEmployee(id: string) {
-    if (confirm('Are you sure to delete?')) {
+    // Create and show delete confirmation modal
+    this.activeModal =
+      this.dynamicComponentService.createComponent(DeleteModalComponent);
+
+    // Handle modal actions
+    this.activeModal.instance.confirm.subscribe(() => {
       this.store.dispatch(EmployeeActions.deleteEmployee({ id }));
+      this.closeModal();
+    });
+
+    this.activeModal.instance.cancel.subscribe(() => {
+      this.closeModal();
+    });
+  }
+
+  private closeModal() {
+    if (this.activeModal) {
+      this.dynamicComponentService.removeComponent(this.activeModal);
+      this.activeModal = undefined;
     }
+  }
+
+  ngOnDestroy() {
+    this.closeModal();
   }
 }
