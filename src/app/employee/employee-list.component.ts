@@ -9,11 +9,18 @@ import { Employee } from '../models/employee.model';
 import * as EmployeeActions from '../store/employee/employee.actions';
 import * as EmployeeSelectors from '../store/employee/employee.selectors';
 import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
+import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
 
 @Component({
   standalone: true,
   selector: 'app-employee-list',
-  imports: [CommonModule, FormsModule, RouterModule, EmployeeSearchPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    EmployeeSearchPipe,
+    MobileFormatPipe,
+  ],
   template: `
     <div class="container mt-4">
       <h2>Employee List</h2>
@@ -59,7 +66,7 @@ import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
               <a [routerLink]="['/employee', emp.id]">{{ emp.name }}</a>
             </td>
             <td>{{ emp.department }}</td>
-            <td>{{ emp.mobile }}</td>
+            <td>{{ emp.mobile | mobileFormat }}</td>
             <td>{{ emp.isActive ? 'Active' : 'Inactive' }}</td>
             <td *ngIf="isAdmin">
               <button
