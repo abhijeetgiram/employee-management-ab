@@ -10,6 +10,7 @@ import {
   loadEmployees,
 } from '../store/employee/employee.actions';
 import { selectAllEmployees } from '../store/employee/employee.selectors';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   standalone: true,
@@ -77,6 +78,7 @@ export class EmployeeFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private store = inject(Store);
+  private toastService = inject(ToastService);
 
   employee: Employee = {
     id: '',
@@ -110,10 +112,10 @@ export class EmployeeFormComponent implements OnInit {
   submitForm() {
     if (this.isEdit) {
       this.store.dispatch(updateEmployee({ employee: this.employee }));
-      alert('Employee updated!');
+      this.toastService.show('Employee updated successfully!', 'success');
     } else {
       this.store.dispatch(addEmployee({ employee: this.employee }));
-      alert('Employee added!');
+      this.toastService.show('Employee added successfully!', 'success');
     }
     this.router.navigate(['/employees']);
   }

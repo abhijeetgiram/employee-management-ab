@@ -19,6 +19,7 @@ import { MobileFormatPipe } from '../pipes/mobile-format.pipe';
 import { StatusHighlightDirective } from '../directives/status-highlight.directive';
 import { DynamicComponentService } from '../services/dynamic-component.service';
 import { DeleteModalComponent } from '../shared/delete-modal.component';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   standalone: true,
@@ -88,7 +89,7 @@ import { DeleteModalComponent } from '../shared/delete-modal.component';
                 Edit
               </button>
               <button
-                class="btn btn-sm btn-danger"
+                class="btn btn-sm btn-danger ms-3"
                 (click)="deleteEmployee(emp.id)"
               >
                 Delete
@@ -117,6 +118,7 @@ import { DeleteModalComponent } from '../shared/delete-modal.component';
 export class EmployeeListComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private dynamicComponentService = inject(DynamicComponentService);
+  private toastService = inject(ToastService);
 
   employees$: Observable<Employee[]> = this.store.select(
     EmployeeSelectors.selectAllEmployees
@@ -145,6 +147,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     // Handle modal actions
     this.activeModal.instance.confirm.subscribe(() => {
       this.store.dispatch(EmployeeActions.deleteEmployee({ id }));
+      this.toastService.show('Employee deleted successfully!', 'success');
       this.closeModal();
     });
 

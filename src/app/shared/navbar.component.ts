@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   standalone: true,
@@ -48,6 +49,7 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export class NavbarComponent {
+  private authService = inject(AuthService);
   constructor(private router: Router) {}
 
   isLoggedIn(): boolean {
@@ -60,6 +62,7 @@ export class NavbarComponent {
 
   logout() {
     localStorage.clear();
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   standalone: true,
@@ -40,15 +41,18 @@ export class LoginComponent {
   email = '';
   password = '';
   loginError = false;
+  private authService = inject(AuthService);
 
   constructor(private router: Router) {}
 
   login() {
     // Only one user hardcoded
     if (this.email === 'admin@example.com' && this.password === 'admin') {
+      this.authService.login();
       localStorage.setItem('role', 'admin');
       this.router.navigate(['/employees']);
     } else if (this.email === 'user@example.com' && this.password === 'user') {
+      this.authService.login();
       localStorage.setItem('role', 'user');
       this.router.navigate(['/employees']);
     } else {
