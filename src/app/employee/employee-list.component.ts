@@ -38,7 +38,7 @@ import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
       <!-- Employee table -->
       <table
         class="table table-bordered"
-        *ngIf="(employees$ | async)?.length > 0; else noData"
+        *ngIf="(employees$ | async)!.length > 0; else noData"
       >
         <thead>
           <tr>
@@ -51,7 +51,9 @@ import { EmployeeSearchPipe } from '../pipes/employee-search.pipe';
         </thead>
         <tbody>
           <tr
-            *ngFor="let emp of employees$ | async | employeeSearch : searchText"
+            *ngFor="
+              let emp of (employees$ | async)! | employeeSearch : searchText
+            "
           >
             <td>
               <a [routerLink]="['/employee', emp.id]">{{ emp.name }}</a>
