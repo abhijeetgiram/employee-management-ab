@@ -7,20 +7,30 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 To start a local development server, run:
 
 ```bash
-ng serve
+npm run start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+To start a json server, run:
+
+```bash
+npm run server
+```
+
+json server is running on `http://localhost:3000/`
+
 # Test Users
 
-Admin
-Email: admin@example.com
-Password: admin
+## Admin
 
-User
-Email: user@example.com
-Password: user
+- Email: `admin@example.com`
+- Password: `admin`
+
+## User
+
+- Email: `user@example.com`
+- Password: `user`
 
 ## Code scaffolding
 
