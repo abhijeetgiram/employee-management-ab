@@ -10,7 +10,7 @@ import { AuthService } from '../services/auth.service';
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/">Employee Management System</a>
+        <a class="navbar-brand" (click)="goHome()">Employee Management System</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -24,9 +24,6 @@ import { AuthService } from '../services/auth.service';
           <ul class="navbar-nav me-auto">
             <li class="nav-item" *ngIf="!isLoggedIn()">
               <a class="nav-link" routerLink="/">Login</a>
-            </li>
-            <li class="nav-item" *ngIf="!isLoggedIn()">
-              <a class="nav-link" routerLink="/signup">Signup</a>
             </li>
             <li class="nav-item" *ngIf="isLoggedIn()">
               <a class="nav-link" routerLink="/employees">Employees</a>
@@ -64,5 +61,13 @@ export class NavbarComponent {
     localStorage.clear();
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+    goHome() {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/employees']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }
