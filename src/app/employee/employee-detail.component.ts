@@ -1,4 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -7,6 +13,7 @@ import { Employee } from '../models/employee.model';
 import * as EmployeeActions from '../store/employee/employee.actions';
 import * as fromEmployee from '../store/employee/employee.selectors';
 import { CardComponent } from '../shared/card.component';
+import { NotesComponent } from '../shared/notes.component';
 
 @Component({
   standalone: true,
@@ -26,6 +33,15 @@ import { CardComponent } from '../shared/card.component';
           <p><strong>Department:</strong> {{ employee.department }}</p>
           <p><strong>Mobile:</strong> {{ employee.mobile }}</p>
           <p><strong>Email:</strong> {{ employee.email }}</p>
+
+          <!-- Dynamic Notes Loading -->
+          <button
+            class="btn btn-outline-primary mt-3"
+            (click)="loadNotes(employee.name)"
+          >
+            Add Notes
+          </button>
+          <ng-container #notesContainer></ng-container>
         </div>
 
         <!-- Card Footer -->
@@ -47,6 +63,11 @@ export class EmployeeDetailComponent implements OnInit {
   employee$: Observable<Employee | null>;
   private store = inject(Store);
 
+  // For dynamic component loading
+  @ViewChild('notesContainer', { read: ViewContainerRef })
+  container!: ViewContainerRef;
+
+
   constructor() {
     this.employee$ = this.store.select(fromEmployee.selectSelectedEmployee);
   }
@@ -54,5 +75,21 @@ export class EmployeeDetailComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.store.dispatch(EmployeeActions.loadEmployeeById({ id }));
+  }
+
+  loadNotes(employeeName: string) {
+    // Clear any existing NotesComponent instance
+    this.container.clear();
+
+    // Dynamically create NotesComponent
+    const compRef = this.container.createComponent(NotesComponent);
+
+    // Pass input value
+    compRef.instance.employeeName = employeeName;
+
+    // Subscribe to the output
+    compRef.instance.noteSaved.subscribe((note: string) => {
+      this.container.clear(); // hide/close NotesComponent
+    });
   }
 }
