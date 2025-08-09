@@ -1,12 +1,12 @@
-// /api/server.js
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-// Path to your db.json in project root
 const dbPath = path.join(process.cwd(), "db.json");
 
 function readDb() {
@@ -17,14 +17,12 @@ function writeDb(data) {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 }
 
-// GET all employees
-app.get("/api/server/employees", (req, res) => {
+app.get("/employees", (req, res) => {
   const db = readDb();
   res.json(db.employees || []);
 });
 
-// POST new employee
-app.post("/api/server/employees", (req, res) => {
+app.post("/employees", (req, res) => {
   const db = readDb();
   const newEmployee = req.body;
   db.employees.push(newEmployee);
@@ -32,13 +30,8 @@ app.post("/api/server/employees", (req, res) => {
   res.status(201).json(newEmployee);
 });
 
-// Local dev: run server
 if (!process.env.VERCEL) {
-  const port = 3000;
-  app.listen(port, () => {
-    console.log(`Mock API running at http://localhost:${port}`);
-  });
+  app.listen(3000, () => console.log("Mock API running locally at http://localhost:3000"));
 }
 
-// Export for Vercel serverless
 module.exports = app;
