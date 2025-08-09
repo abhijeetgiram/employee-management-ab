@@ -11,6 +11,7 @@ import {
 } from '../store/employee/employee.actions';
 import { selectAllEmployees } from '../store/employee/employee.selectors';
 import { ToastService } from '../services/toast.service';
+import { CanComponentDeactivate } from '../guard/can-deactivate.guard';
 
 @Component({
   standalone: true,
@@ -84,7 +85,7 @@ import { ToastService } from '../services/toast.service';
     </div>
   `,
 })
-export class EmployeeFormComponent implements OnInit {
+export class EmployeeFormComponent implements OnInit, CanComponentDeactivate {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private store = inject(Store);
@@ -101,25 +102,29 @@ export class EmployeeFormComponent implements OnInit {
   };
 
   isEdit = false;
+  private isFormSubmitted = false;
+  private originalEmployee!: Employee;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit = true;
-
-      // Make sure employees are loaded
       this.store.dispatch(loadEmployees({ employees: [] }));
-
       this.store.select(selectAllEmployees).subscribe((employees) => {
         const emp = employees.find((e) => e.id === id);
         if (emp) {
           this.employee = { ...emp };
+          this.originalEmployee = { ...emp };
         }
       });
+    } else {
+      this.originalEmployee = { ...this.employee };
     }
   }
 
   submitForm() {
+    this.isFormSubmitted = true;
+
     if (this.isEdit) {
       this.store.dispatch(updateEmployee({ employee: this.employee }));
       this.toastService.show('Employee updated successfully!', 'success');
@@ -129,4 +134,16 @@ export class EmployeeFormComponent implements OnInit {
     }
     this.router.navigate(['/employees']);
   }
+
+  // Method required by CanDeactivate
+  canDeactivate(): boolean {
+    if (this.isFormSubmitted) return true;
+
+    const isChanged = JSON.stringify(this.employee) !== JSON.stringify(this.originalEmployee);
+    if (isChanged) {
+      return confirm('You have unsaved changes. Do you really want to leave?');
+    }
+    return true;
+  }
 }
+

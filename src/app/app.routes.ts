@@ -1,32 +1,31 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login.component';
-import { EmployeeListComponent } from './employee/employee-list.component';
-import { EmployeeDetailComponent } from './employee/employee-detail.component';
-import { EmployeeFormComponent } from './employee/employee-form.component';
 import { authGuard } from './guard/auth.guard';
-import { PageNotFoundComponent } from './shared/page-not-found.component';
+import { CanDeactivateGuard } from './guard/can-deactivate.guard';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   {
     path: 'employees',
-    component: EmployeeListComponent,
+    loadComponent: () => import('./employee/employee-list.component').then(m => m.EmployeeListComponent),
     canActivate: [authGuard],
   },
   { path: 'employee/:id', 
-    component: EmployeeDetailComponent, 
+    loadComponent: () => import('./employee/employee-detail.component').then(m => m.EmployeeDetailComponent),
     canActivate: [authGuard], 
   },
   { path: 'employee-edit/:id', 
-    component: EmployeeFormComponent, 
-    canActivate: [authGuard] 
+    loadComponent: () => import('./employee/employee-form.component').then(m => m.EmployeeFormComponent),
+    canActivate: [authGuard] ,
+     canDeactivate: [CanDeactivateGuard],
   },
   { path: 'employee-add', 
-    component: EmployeeFormComponent, 
-    canActivate: [authGuard] 
+    loadComponent: () => import('./employee/employee-form.component').then(m => m.EmployeeFormComponent),
+    canActivate: [authGuard] ,
+     canDeactivate: [CanDeactivateGuard],
   },
   {
     path: '**', 
-    component: PageNotFoundComponent,
+    loadComponent: () => import('./shared/page-not-found.component').then(m => m.PageNotFoundComponent),
   }
 ];
