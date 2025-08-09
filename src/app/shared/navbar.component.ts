@@ -10,7 +10,7 @@ import { AuthService } from '../services/auth.service';
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" (click)="goHome()">Employee Management System</a>
+        <a class="navbar-brand cursor-pointer" (click)="goHome()">Employee Management System</a>
         <button
           class="navbar-toggler"
           type="button"

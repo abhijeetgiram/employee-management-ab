@@ -6,30 +6,39 @@ import { Observable } from 'rxjs';
 import { Employee } from '../models/employee.model';
 import * as EmployeeActions from '../store/employee/employee.actions';
 import * as fromEmployee from '../store/employee/employee.selectors';
+import { CardComponent } from '../shared/card.component';
 
 @Component({
   standalone: true,
   selector: 'app-employee-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, CardComponent],
   template: `
     <div class="container mt-5" *ngIf="employee$ | async as employee">
-      <h2>Employee Details</h2>
-      <ul class="list-group">
-        <li class="list-group-item"><strong>ID:</strong> {{ employee.id }}</li>
-        <li class="list-group-item">
-          <strong>Name:</strong> {{ employee.name }}
-        </li>
-        <li class="list-group-item">
-          <strong>Department:</strong> {{ employee.department }}
-        </li>
-        <li class="list-group-item">
-          <strong>Mobile:</strong> {{ employee.mobile }}
-        </li>
-        <li class="list-group-item">
-          <strong>Status:</strong>
-          {{ employee.isActive ? 'Active' : 'Inactive' }}
-        </li>
-      </ul>
+      <app-card>
+        <!-- Card Header -->
+        <div card-header>
+          {{ employee.name }} - {{ employee.role }}
+        </div>
+
+        <!-- Card Body -->
+        <div card-body>
+          <p><strong>ID:</strong> {{ employee.id }}</p>
+          <p><strong>Department:</strong> {{ employee.department }}</p>
+          <p><strong>Mobile:</strong> {{ employee.mobile }}</p>
+          <p><strong>Email:</strong> {{ employee.email }}</p>
+        </div>
+
+        <!-- Card Footer -->
+        <div card-footer>
+          Status:
+          <span
+            [class.text-success]="employee.isActive"
+            [class.text-danger]="!employee.isActive"
+          >
+            {{ employee.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </app-card>
     </div>
   `,
 })
