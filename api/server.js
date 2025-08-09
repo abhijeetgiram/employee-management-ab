@@ -1,20 +1,44 @@
-const jsonServer = require("json-server");
+// /api/server.js
+const express = require("express");
+const fs = require("fs");
 const path = require("path");
 
-const server = jsonServer.create();
-const router = jsonServer.router(path.join(process.cwd(), "db.json"));
-const middlewares = jsonServer.defaults();
+const app = express();
+app.use(express.json());
 
-server.use(middlewares);
-server.use(router);
+// Path to your db.json in project root
+const dbPath = path.join(process.cwd(), "db.json");
 
-if (process.env.VERCEL) {
-  // On Vercel → export handler
-  module.exports = server;
-} else {
-  // Local dev
+function readDb() {
+  return JSON.parse(fs.readFileSync(dbPath, "utf-8"));
+}
+
+function writeDb(data) {
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+}
+
+// GET all employees
+app.get("/api/server/employees", (req, res) => {
+  const db = readDb();
+  res.json(db.employees || []);
+});
+
+// POST new employee
+app.post("/api/server/employees", (req, res) => {
+  const db = readDb();
+  const newEmployee = req.body;
+  db.employees.push(newEmployee);
+  writeDb(db);
+  res.status(201).json(newEmployee);
+});
+
+// Local dev: run server
+if (!process.env.VERCEL) {
   const port = 3000;
-  server.listen(port, () => {
-    console.log(`JSON Server running on http://localhost:${port}`);
+  app.listen(port, () => {
+    console.log(`Mock API running at http://localhost:${port}`);
   });
 }
+
+// Export for Vercel serverless
+module.exports = app;
