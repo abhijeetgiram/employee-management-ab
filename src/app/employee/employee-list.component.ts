@@ -134,7 +134,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   isAdmin = localStorage.getItem('role') === 'admin';
 
   ngOnInit() {
-    this.store.dispatch(EmployeeActions.loadEmployees());
+    this.store.dispatch(EmployeeActions.loadEmployees({ employees: [] }));
   }
 
   private activeModal?: ComponentRef<DeleteModalComponent>;

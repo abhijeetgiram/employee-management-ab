@@ -49,6 +49,16 @@ import { ToastService } from '../services/toast.service';
           />
         </div>
         <div class="mb-3">
+          <label>Mobile</label>
+          <input
+            [(ngModel)]="employee.mobile"
+            name="mobile"
+            required
+            class="form-control"
+            type="tel"
+          />
+        </div>
+        <div class="mb-3">
           <label>Email</label>
           <input
             [(ngModel)]="employee.email"
@@ -98,7 +108,7 @@ export class EmployeeFormComponent implements OnInit {
       this.isEdit = true;
 
       // Make sure employees are loaded
-      this.store.dispatch(loadEmployees());
+      this.store.dispatch(loadEmployees({ employees: [] }));
 
       this.store.select(selectAllEmployees).subscribe((employees) => {
         const emp = employees.find((e) => e.id === id);

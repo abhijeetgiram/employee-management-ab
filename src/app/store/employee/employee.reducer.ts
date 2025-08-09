@@ -7,39 +7,28 @@ export const employeeReducer = createReducer(
 
   on(EmployeeActions.loadEmployees, (state) => ({
     ...state,
-    loading: true,
-    error: null,
-  })),
-  on(EmployeeActions.loadEmployeesSuccess, (state, { employees }) => ({
-    ...state,
-    employees,
-    loading: false,
-  })),
-  on(EmployeeActions.loadEmployeesFailure, (state, { error }) => ({
-    ...state,
-    loading: false,
-    error,
+    employees: [...state.employees,]
   })),
 
-  on(EmployeeActions.addEmployeeSuccess, (state, { employee }) => ({
+  on(EmployeeActions.addEmployee, (state, { employee }) => ({
     ...state,
     employees: [...state.employees, employee],
   })),
 
-  on(EmployeeActions.updateEmployeeSuccess, (state, { employee }) => ({
+  on(EmployeeActions.updateEmployee, (state, { employee }) => ({
     ...state,
     employees: state.employees.map((emp) =>
       emp.id === employee.id ? employee : emp
     ),
   })),
 
-  on(EmployeeActions.deleteEmployeeSuccess, (state, { id }) => ({
+  on(EmployeeActions.deleteEmployee, (state, { id }) => ({
     ...state,
     employees: state.employees.filter((emp) => emp.id !== id),
   })),
 
-  on(EmployeeActions.loadEmployeeByIdSuccess, (state, { employee }) => ({
+  on(EmployeeActions.loadEmployeeById, (state, { id }) => ({
     ...state,
-    selectedEmployee: employee,
+    selectedEmployee: state.employees.find((emp) => emp.id === id) || null,
   }))
 );

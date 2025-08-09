@@ -1,18 +1,15 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../services/toast.service';
 
-declare const bootstrap: any; // Bootstrap JS API
+declare const bootstrap: any;
 
 @Component({
   selector: 'app-toast',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div
-      class="toast-container position-fixed top-0 end-0 p-3"
-      style="z-index: 2000"
-    >
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000">
       <div
         #toastEl
         class="toast align-items-center border-0"
@@ -38,13 +35,16 @@ export class ToastComponent {
   message = '';
   bgClass = 'text-bg-info';
 
-  constructor(private toastService: ToastService) {
+  constructor(private toastService: ToastService, private cdr: ChangeDetectorRef) {
     effect(() => {
       const toastData = this.toastService.toastMessage();
       if (toastData) {
-        this.message = toastData.text;
-        this.bgClass = `text-bg-${toastData.type}`;
-        setTimeout(() => this.showToast(), 0);
+        setTimeout(() => {
+          this.message = toastData.text;
+          this.bgClass = `text-bg-${toastData.type}`;
+          this.cdr.detectChanges(); // Ensure Angular knows about the update
+          this.showToast();
+        });
       }
     });
   }
