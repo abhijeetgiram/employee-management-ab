@@ -1,5 +1,23 @@
 # EmployeeManagementAb
 
+Advanced angular assignment | CRUD employee | NGRX | Signals | Standalone | v20
+
+# Test Users
+
+## Admin
+
+- Email: `admin@example.com`
+- Password: `admin`
+
+## User
+
+- Email: `user@example.com`
+- Password: `user`
+
+# Deployed using vercel
+
+URL: https://employee-management-ab.vercel.app/
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
 
 ## Development server
@@ -20,18 +38,7 @@ npm run server
 
 json server is running on `http://localhost:3000/`
 
-# Test Users
-
-## Admin
-
-- Email: `admin@example.com`
-- Password: `admin`
-
-## User
-
-- Email: `user@example.com`
-- Password: `user`
-
+# Ignore below default information
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
